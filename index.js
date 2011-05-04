@@ -1,1 +1,1 @@
-lib/cas_validate.js
+module.exports = require('./lib/cas_validate.js');
