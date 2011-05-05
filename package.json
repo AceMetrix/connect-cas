@@ -8,5 +8,13 @@
   },
   "engines": {
     "node": "*"
+  },
+  "dependencies": {
+      "hiredis":">= 0.1.9"
+      ,"redis":">= 0.6.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "url": ""
   }
 }
