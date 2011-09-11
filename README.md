@@ -41,12 +41,25 @@ and it should work.
 
 # Installation
 
+Do something like:
+
 ```bash
-$
+$ cd ~/my/github/repos
 $ git clone git://github.com/jmarca/cas_validate.git
 $ cd myapplication
-$ npm install
+$ npm install ~/my/github/repos/cas_validate
 ```
+
+(One of these days I will publish to npm, but not yet.  I have to
+figure out how to test this first!)
+
+# Tests
+
+No tests at the moment.
+
+Just set up a test server and see if it works for you.
+Which is lame, I know.  It works for me, though.
+
 
 # See Also
 
