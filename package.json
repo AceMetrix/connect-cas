@@ -1,7 +1,7 @@
 {
   "name": "cas_validate",
   "description": "Interact with a CAS server to validate client interaction",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "James E. Marca <jmarca@translab.its.uci.edu>",
   "directories": {
     "lib": "./lib"
@@ -12,6 +12,7 @@
   "dependencies": {
     "hiredis": ">= 0.1.9",
     "redis": ">= 0.6.0",
+    "underscore": "",
     "request": ""
   },
   "devDependencies": {},
