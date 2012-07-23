@@ -15,8 +15,8 @@
     "underscore": "",
     "request": ""
   },
-  "devDependencies": {},
-  "repository": {
-    "url": ""
-  }
+    "devDependencies": {
+        "mocha":"*"
+    },
+  "repository": "git://github.com/jmarca/cas_validate"
 }
