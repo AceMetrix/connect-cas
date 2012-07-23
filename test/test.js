@@ -107,7 +107,11 @@ describe('cas_validate.redirect',function(){
                                           });
         })
     after(function(done){
-        server.close(done)
+        console.log('shut down server')
+        server.close(function(e){
+            if(e) throw new Error(e);
+            done()
+        })
     })
     it('should redirect when no session is established',function(done){
 
