@@ -1,5 +1,5 @@
 
-MOCHA_OPTS=bail
+MOCHA_OPTS=--bail --timeout 15000
 REPORTER = nyan
 
 
