@@ -12,6 +12,7 @@ var cpass = process.env.CAS_PASS;
 var casurl = 'https://'+chost + '/cas/login'
 
 var testhost = env.CAS_VALIDATE_TEST_URL || '127.0.0.1'
+var testport = env.CAS_VALIDATE_TEST_PORT || 3000
 
 var _ = require('underscore');
 
@@ -94,13 +95,13 @@ describe('cas_validate.redirect',function(){
                   .use(connect.cookieParser('barley wheat napoleon'))
                   .use(connect.session({ store: new RedisStore }))
                   .use(cas_validate.redirect({'cas_host':chost
-                                             ,'service':'http://'+ testhost +':3000/index.html'})
+                                             ,'service':'http://'+ testhost +':'+testport+'/index.html'})
                       )
                   .use(function(req, res, next){
                       should.not.exist(req)
                       res.end('hello world')
                   });
-            server = http.createServer(app).listen(3000
+            server = http.createServer(app).listen(testport
                                          ,function(){
                                               done()
                                           });
@@ -115,11 +116,11 @@ describe('cas_validate.redirect',function(){
                          }
                         ,function(rq,cb){
 
-                             rq({url:'http://'+ testhost +':3000/'
+                             rq({url:'http://'+ testhost +':'+testport+'/'
                                 ,followRedirect:false}
                                ,function(e,r,b){
                                     r.statusCode.should.equal(307)
-                                    r.headers.location.should.equal(casurl+'?service=http%3A%2F%2F'+ testhost +'%3A3000%2Findex.html')
+                                    r.headers.location.should.equal(casurl+'?service=http%3A%2F%2F'+ testhost +'%3A'+testport+'%2Findex.html')
                                     should.not.exist(b)
                                     cb()
                                 }
@@ -145,11 +146,11 @@ describe('cas_validate.redirect',function(){
                                                 })
                          }
                         ,function(rq,cb){
-                             rq({url:'http://'+ testhost +':3000/'
+                             rq({url:'http://'+ testhost +':'+testport+'/'
                                 ,followRedirect:false}
                                ,function(e,r,b){
                                     r.statusCode.should.equal(307)
-                                    r.headers.location.should.equal(casurl+'?service=http%3A%2F%2F'+ testhost +'%3A3000%2Findex.html')
+                                    r.headers.location.should.equal(casurl+'?service=http%3A%2F%2F'+ testhost +'%3A'+testport+'%2Findex.html')
                                     should.not.exist(b)
                                     cb()
                                 }
@@ -182,7 +183,7 @@ describe('cas_validate.check_and_return',function(){
 
                     });
             app.use(cas_validate.check_and_return({'cas_host':chost
-                                                  ,'service':'http://'+ testhost +':3000/valid'}))
+                                                  ,'service':'http://'+ testhost +':'+testport+'/valid'}))
             app.use('/'
                    ,function(req, res, next){
                       // should never get here
@@ -192,7 +193,7 @@ describe('cas_validate.check_and_return',function(){
                           return res.end('hello world choke and die')
                       }
                     });
-            server = http.createServer(app).listen(3000,done)
+            server = http.createServer(app).listen(testport,done)
 
         })
 
@@ -209,7 +210,7 @@ describe('cas_validate.check_and_return',function(){
                          }
                         ,function(rq,cb){
 
-                             rq({url:'http://'+ testhost +':3000/'
+                             rq({url:'http://'+ testhost +':'+testport+'/'
                                 ,followRedirect:true}
                                ,function(e,r,b){
                                     r.statusCode.should.equal(200)
@@ -238,7 +239,7 @@ describe('cas_validate.check_and_return',function(){
                                                 })
                          }
                         ,function(rq,cb){
-                             rq({url:'http://'+ testhost +':3000/'}
+                             rq({url:'http://'+ testhost +':'+testport+'/'}
                                ,function(e,r,b){
                                     r.statusCode.should.equal(200)
                                     should.exist(b)
@@ -270,7 +271,7 @@ describe('cas_validate.check_or_redirect and cas_validate.ticket',function(){
                   .use(function(req, res, next){
                       res.end('hello world')
                   });
-            server = http.createServer(app).listen(3000
+            server = http.createServer(app).listen(testport
                                                   ,done)
         })
     after(function(done){
@@ -283,11 +284,11 @@ describe('cas_validate.check_or_redirect and cas_validate.ticket',function(){
                          }
                         ,function(rq,cb){
 
-                             rq({url:'http://'+ testhost +':3000/'
+                             rq({url:'http://'+ testhost +':'+testport+'/'
                                 ,followRedirect:false}
                                ,function(e,r,b){
                                     r.statusCode.should.equal(307)
-                                    r.headers.location.should.equal(casurl+'?service=http%3A%2F%2F'+ testhost +'%3A3000%2F')
+                                    r.headers.location.should.equal(casurl+'?service=http%3A%2F%2F'+ testhost +'%3A'+testport+'%2F')
                                     should.not.exist(b)
                                     cb()
                                 }
@@ -313,7 +314,7 @@ describe('cas_validate.check_or_redirect and cas_validate.ticket',function(){
                                                 })
                          }
                         ,function(rq,cb){
-                             rq({url:'http://'+ testhost +':3000/'}
+                             rq({url:'http://'+ testhost +':'+testport+'/'}
                                ,function(e,r,b){
                                     r.statusCode.should.equal(200)
                                     should.exist(b)
@@ -349,7 +350,7 @@ describe('cas_validate.username',function(){
             app.use('/',function(req, res, next){
                       res.end('hello world')
                   });
-            server = http.createServer(app).listen(3000
+            server = http.createServer(app).listen(testport
                                                   ,done)
         })
     after(function(done){
@@ -362,7 +363,7 @@ describe('cas_validate.username',function(){
                          }
                         ,function(rq,cb){
 
-                             rq({url:'http://'+ testhost +':3000/username'
+                             rq({url:'http://'+ testhost +':'+testport+'/username'
                                 ,followRedirect:true}
                                ,function(e,r,b){
                                     r.statusCode.should.equal(200)
@@ -392,12 +393,12 @@ describe('cas_validate.username',function(){
                                                 })
                          }
                         ,function(rq,cb){
-                             rq('http://'+ testhost +':3000/'
+                             rq('http://'+ testhost +':'+testport+'/'
                                ,function(e,r,b){
 
                                     b.should.equal('hello world');
                                     // session established, now we can get username
-                                    rq({url:'http://'+ testhost +':3000/username'}
+                                    rq({url:'http://'+ testhost +':'+testport+'/username'}
                                       ,function(e,r,b){
                                            r.statusCode.should.equal(200)
                                            should.exist(b)
@@ -444,7 +445,7 @@ describe('cas_validate.session_or_abort',function(){
             app.use('/',function(req, res, next){
                       res.end('hello world')
                   });
-            server = http.createServer(app).listen(3000
+            server = http.createServer(app).listen(testport
                                                   ,done)
         })
     after(function(done){
@@ -458,7 +459,7 @@ describe('cas_validate.session_or_abort',function(){
                          }
                         ,function(rq,cb){
 
-                             rq({url:'http://'+ testhost +':3000/secrets'
+                             rq({url:'http://'+ testhost +':'+testport+'/secrets'
                                 ,followRedirect:true}
                                ,function(e,r,b){
                                     r.statusCode.should.equal(200)
@@ -483,12 +484,12 @@ describe('cas_validate.session_or_abort',function(){
                                                 })
                          }
                         ,function(rq,cb){
-                             rq('http://'+ testhost +':3000/'
+                             rq('http://'+ testhost +':'+testport+'/'
                                ,function(e,r,b){
 
                                     b.should.equal('hello world');
                                     // session established, now we can get secrets
-                                    rq({url:'http://'+ testhost +':3000/secrets'}
+                                    rq({url:'http://'+ testhost +':'+testport+'/secrets'}
                                       ,function(e,r,b){
                                            r.statusCode.should.equal(200)
                                            should.exist(b)
@@ -524,7 +525,7 @@ describe('cas_validate.ssoff',function(){
             app.use('/',function(req, res, next){
                       res.end('hello world')
             });
-            server = http.createServer(app).listen(3000
+            server = http.createServer(app).listen(testport
                                                   ,done)
         })
     after(function(done){
@@ -548,7 +549,7 @@ describe('cas_validate.ssoff',function(){
                                                 })
                          }
                         ,function(rq,cb){
-                             rq('http://'+ testhost +':3000/'
+                             rq('http://'+ testhost +':'+testport+'/'
                                ,function(e,r,b){
                                     b.should.equal('hello world');
                                     // session established, now we can get username
@@ -556,7 +557,7 @@ describe('cas_validate.ssoff',function(){
                                 })
                          }
                         ,function(rq,cb){
-                             rq({url:'http://'+ testhost +':3000/username'}
+                             rq({url:'http://'+ testhost +':'+testport+'/username'}
                                ,function(e,r,b){
                                     var u = JSON.parse(b)
                                     u.should.have.property('user',cuser)
@@ -572,7 +573,7 @@ describe('cas_validate.ssoff',function(){
                          }
                         ,function(rq,cb){
                              // and finally the real test
-                             rq({url:'http://'+ testhost +':3000/username'}
+                             rq({url:'http://'+ testhost +':'+testport+'/username'}
                                ,function(e,r,b){
                                     var u = JSON.parse(b)
                                     u.should.have.property('user',null)
