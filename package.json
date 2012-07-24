@@ -1,7 +1,7 @@
 {
   "name": "cas_validate",
   "description": "Interact with a CAS server to validate client interaction",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "author": "James E. Marca <jmarca@translab.its.uci.edu>",
   "directories": {
     "lib": "./lib"
@@ -15,14 +15,14 @@
     "underscore": "",
     "request": ""
   },
-    "devDependencies": {
-        "mocha":"*",
-        "should":"*",
-        "connect":"*",
-        "connect-redis":"*",
-        "node-redis":"*",
-        "express":"*",
-        "async":"*"
-    },
+  "devDependencies": {
+    "mocha": "*",
+    "should": "*",
+    "connect": "*",
+    "connect-redis": "*",
+    "node-redis": "*",
+    "express": "*",
+    "async": "*"
+  },
   "repository": "git://github.com/jmarca/cas_validate"
 }
