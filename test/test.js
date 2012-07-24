@@ -77,18 +77,21 @@ function cas_login_function(rq,callback){
              })
          }
 function cas_logout_function(rq,callback){
-             var logouturl = 'https://'+chost + '/cas/logout'
-             rq(logouturl
-               ,function(e,r,b){
-                    callback(e,rq)
-                })
-         }
+    var logouturl = 'https://'+chost + '/cas/logout';
+    rq(logouturl
+       ,function(e,r,b){
+           // give the server a chance to fire off its post
+           setTimeout(function(){
+               callback(e,rq)
+           },100)
+       })
+}
 
 
 
 describe('cas_validate.redirect',function(){
-    var app;
-    var server;
+    var app,server
+
     before(
         function(done){
             app = connect()
@@ -101,17 +104,10 @@ describe('cas_validate.redirect',function(){
                       should.not.exist(req)
                       res.end('hello world')
                   });
-            server = http.createServer(app).listen(testport
-                                         ,function(){
-                                              done()
-                                          });
+            server = app.listen(testport,done)
         })
     after(function(done){
-        console.log('shut down server')
-        server.close(function(e){
-            if(e) throw new Error(e);
-            done()
-        })
+        server.close(done)
     })
     it('should redirect when no session is established',function(done){
 
@@ -123,6 +119,7 @@ describe('cas_validate.redirect',function(){
                              rq({url:'http://'+ testhost +':'+testport+'/'
                                 ,followRedirect:false}
                                ,function(e,r,b){
+                                   console.log({url:'http://'+ testhost +':'+testport+'/'})
                                     r.statusCode.should.equal(307)
                                     r.headers.location.should.equal(casurl+'?service=http%3A%2F%2F'+ testhost +'%3A'+testport+'%2Findex.html')
                                     should.not.exist(b)
@@ -197,14 +194,12 @@ describe('cas_validate.check_and_return',function(){
                           return res.end('hello world choke and die')
                       }
                     });
-            server = http.createServer(app).listen(testport,done)
+            server=app.listen(testport,done)
 
         })
 
     after(function(done){
-        server.close(function(e){
-            done()
-        })
+        server.close(done)
     })
 
     it('should return without asking for login when no session is established',function(done){
@@ -262,8 +257,8 @@ describe('cas_validate.check_and_return',function(){
 })
 
 describe('cas_validate.check_or_redirect and cas_validate.ticket',function(){
-    var app;
-    var server;
+    var app,server;
+
     before(
         function(done){
             app = connect()
@@ -275,7 +270,7 @@ describe('cas_validate.check_or_redirect and cas_validate.ticket',function(){
                   .use(function(req, res, next){
                       res.end('hello world')
                   });
-            server = http.createServer(app).listen(testport
+            server =app.listen(testport
                                                   ,done)
         })
     after(function(done){
@@ -338,8 +333,8 @@ describe('cas_validate.check_or_redirect and cas_validate.ticket',function(){
 
 describe('cas_validate.username',function(){
 
-    var app;
-    var server;
+    var app,server;
+
     before(
         function(done){
             app = connect()
@@ -354,12 +349,13 @@ describe('cas_validate.username',function(){
             app.use('/',function(req, res, next){
                       res.end('hello world')
                   });
-            server = http.createServer(app).listen(testport
+            server = app.listen(testport
                                                   ,done)
         })
     after(function(done){
         server.close(done)
     })
+
 
     it('should reply with an empty json object when no session is established',function(done){
         async.waterfall([function(cb){
@@ -424,8 +420,8 @@ describe('cas_validate.username',function(){
 // this is an express-only feature, as next('route') was removed from connect
 describe('cas_validate.session_or_abort',function(){
 
-    var app;
-    var server;
+    var app,server;
+
     before(
         function(done){
             app = express()
@@ -449,7 +445,7 @@ describe('cas_validate.session_or_abort',function(){
             app.use('/',function(req, res, next){
                       res.end('hello world')
                   });
-            server = http.createServer(app).listen(testport
+            server=app.listen(testport
                                                   ,done)
         })
     after(function(done){
@@ -513,24 +509,30 @@ describe('cas_validate.session_or_abort',function(){
 describe('cas_validate.ssoff',function(){
 
 
-    var app;
-    var server;
+    var app,server;
+
     before(
         function(done){
             app = connect()
+                .use(connect.bodyParser())
                   .use(connect.cookieParser('barley Waterloo Napoleon Mareschal Foch'))
                   .use(connect.session({ store: new RedisStore }))
 
             app.use('/username',cas_validate.username)
 
-            app.use(cas_validate.ticket({'cas_host':chost}))
-            app.use(cas_validate.check_or_redirect({'cas_host':chost}))
+            // note that ssoff has to go first, because otherwise the
+            // CAS server itself doesn't have a valid session!
             app.use(cas_validate.ssoff())
+            app.use(cas_validate.ticket({'cas_host':chost
+                                         ,'service':'http://lysithia.its.uci.edu:'+testport}))
+            app.use(cas_validate.check_or_redirect({'cas_host':chost
+                                         ,'service':'http://lysithia.its.uci.edu:'+testport}))
+
             app.use('/',function(req, res, next){
                       res.end('hello world')
             });
-            server = http.createServer(app).listen(testport
-                                                  ,done)
+            server=app.listen(testport
+                       ,done)
         })
     after(function(done){
         server.close(done)
@@ -539,7 +541,7 @@ describe('cas_validate.ssoff',function(){
     it('should delete the session when the user signs out of CAS server (single sign off)',function(done){
         if(testhost === '127.0.0.1'){
             // this test generally will fail unless CAS can post to this host
-            done(new Error('test aborted on 127.0.0.1.  Try re-running with the CAS_VALIDATE_TEST_URL set to a url that your CAS server can post to'))
+            return done(new Error('test aborted on 127.0.0.1.  Try re-running with the CAS_VALIDATE_TEST_URL set to a url that your CAS server can post to'))
         }
 
         async.waterfall([function(cb){
@@ -553,9 +555,10 @@ describe('cas_validate.ssoff',function(){
                                                 })
                          }
                         ,function(rq,cb){
-                             rq('http://'+ testhost +':'+testport+'/'
+
+                            rq('http://'+ testhost +':'+testport+'/'
                                ,function(e,r,b){
-                                    b.should.equal('hello world');
+                                   b.should.equal('hello world');
                                     // session established, now we can get username
                                     cb(e,rq)
                                 })
@@ -571,9 +574,7 @@ describe('cas_validate.ssoff',function(){
                         ,function(rq,cb){
                              // now log out of CAS directly
                              cas_logout_function(rq
-                                                ,function(e){
-                                                     cb(e,rq)
-                                                 })
+                                                 ,cb)
                          }
                         ,function(rq,cb){
                              // and finally the real test
@@ -586,7 +587,7 @@ describe('cas_validate.ssoff',function(){
                          }]
                        ,done
                        )
-
+        return null;
     })
 
 })
