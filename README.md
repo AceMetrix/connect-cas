@@ -60,8 +60,17 @@ only user of this library I haven't changed it yet.
 
 # Installation
 
-Until I upload this to NPM, the only way to install it is manually:
+## Via npm
 
+```bash
+$ cd myapplication
+$ npm install cas_validate
+```
+
+Or you can add it to your package.json dependencies.
+
+
+## Manual install
 
 ```bash
 $ cd ~/my/github/repos
@@ -70,8 +79,7 @@ $ cd myapplication
 $ npm install ~/my/github/repos/cas_validate
 ```
 
-Very soon I will publish this to NPM, as the tests have been written
-and are passing
+
 
 # Exported Functions
 
@@ -255,6 +263,70 @@ app.use(cas_validate.check_or_redirect())
 app.use('/',function(req, res, next){
           res.end('hello only to the authenticated world')
 });
+
+```
+
+## `logout`
+
+The `logout` service is similar to single sign off, but does the job
+of invalidating the current session first, before triggering the CAS
+server's logout function.
+
+You can use this with the `ssoff` service to enable logging out from
+your application directly, or indirectly from some other CAS enabled
+app.
+
+### Options
+
+* `cas_host`: the CAS hostname, without the 'https://' part and
+  without the '/cas/logout' part.  Something like `cas.example.net`.
+  The default is to read the CAS_HOST environment variable.  This
+  option, if set, will override the default.
+
+* `service`: the service for which the service ticket will be issued,
+  and to which the CAS server will redirect the request after the user
+  has logged in.  The default is to figure out the service from the
+  incoming request, but one may want to redirect the incoming request
+  somewhere else.
+
+
+### Example
+
+As usual, check out the test for a complete example.  Cut and paste below:
+
+```javascript
+
+app = connect()
+    .use(connect.bodyParser())
+      .use(connect.cookieParser('barley Waterloo Napoleon loser'))
+      .use(connect.session({ store: new RedisStore }))
+
+app.use('/username',cas_validate.username)
+
+app.use('/quit',cas_validate.logout({'cas_host':'my.cas.host'
+                                    ,'service':'http://myhost.com'}))
+app.use(cas_validate.ssoff())
+app.use(cas_validate.ticket({'cas_host':'my.cas.host'
+                             ,'service':'http://myhost.com'}))
+app.use(cas_validate.check_and_return({'cas_host':'my.cas.host'
+                                      ,'service':'http://myhost.com'}))
+
+app.use(function(req, res, next){
+            if(req.session.st){
+                return res.end('hello '+req.session.name)
+            }else{
+                return res.end('hello world (not logged in)')
+            }
+        }
+       )
+var login = connect()
+.use(connect.cookieParser('six foot barley at Waterloo'))
+.use(connect.session({ store: new RedisStore }))
+login.use('/login',cas_validate.check_or_redirect({'cas_host':'my.cas.host'
+                                                  ,'service':'http://myhost.com'}))
+login.use('/',app)
+server=login.listen(testport
+                   ,done)
 
 ```
 
