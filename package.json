@@ -20,7 +20,6 @@
     "should": "*",
     "connect": "*",
     "connect-redis": "*",
-    "node-redis": "*",
     "express": "*",
     "async": "*"
   },
