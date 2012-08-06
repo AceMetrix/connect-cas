@@ -20,7 +20,7 @@
     "should": "*",
     "connect": "*",
     "connect-redis": "*",
-    "express": "*",
+    "express": ">=3.0.0rc2",
     "async": "*"
   },
   "repository": "git://github.com/jmarca/cas_validate"
