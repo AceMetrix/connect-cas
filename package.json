@@ -1,13 +1,13 @@
 {
   "name": "cas_validate",
   "description": "Interact with a CAS server to validate client interaction",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "author": "James E. Marca <jmarca@translab.its.uci.edu>",
-    "keywords": [
-        "cas",
-        "central authentication service",
-        "authentication"
-    ],
+  "keywords": [
+    "cas",
+    "central authentication service",
+    "authentication"
+  ],
   "directories": {
     "lib": "./lib"
   },
