@@ -1,8 +1,9 @@
 # CAS Validate
 
 This is a utility to facilitate validating a web service based on
-Connect or Express with a CAS server(<http://www.jasig.org/cas>.  It
-allows single sign on and
+Connect or Express (and perhaps other frameworks or nothing at all)
+with a CAS server(<http://www.jasig.org/cas>.  It allows single sign
+on and
 [single sign out](https://wiki.jasig.org/display/CASUM/Single+Sign+Out).
 In other words, if a client has previously logged in to the CAS
 server, this library will allow your service to transparently detect
@@ -54,8 +55,8 @@ operations such as
 they should work fine.
 
 Second, the `cas_host` option currently just wants the host.  I prepend
-`https://` to this host.  This should probably be changed, but as the
-only user of this library I haven't changed it yet.
+`https://` to this host.  If you aren't using https for your CAS
+server, then you're out of luck for using this library.
 
 
 # Installation
@@ -165,6 +166,11 @@ to the `/login` path, the `ticket` service is not attached to that
 route.  It is attached to the `/` route, and will consume the ticket
 there.
 
+Also also, when the CAS session expires and the CAS server sends a
+post request informing your server of this fact, it will send it to
+the path listed in the `service` parameter.  So if you only want to
+allow POST requests to a certain address, that is another reason to
+specify the service parameter.
 
 ## `check_and_return`
 
@@ -246,7 +252,7 @@ bounce the request.
 The `ssoff` service will listen for incoming POST messages from the
 CAS server and will delete sessions as appropriate.
 
-Do not put this service after the `check_or_redirect` service, or the
+Do *not* put this service after the `check_or_redirect` service, or the
 CAS server POSTs will get redirected to the CAS server to log in!
 
 ### Options
@@ -419,7 +425,8 @@ to set lots of environment variables.
 * CAS_VALIDATE_TEST_URL: Default is '127.0.0.1'.  If you want to test
   single sign out (the `ssoff` service), then you'll need to run your
   test server on a public machine, with a URL that the CAS server can
-  send a POST to.
+  send a POST to.  SSOFF tests will be skipped if CAS_VALIDATE_TEST_URL
+  is 127.0.0.1 and the hostname part of CAS_HOST is *not* 127.0.0.1.
 
 * CAS_VALIDATE_TEST_PORT: Default is 3000.  If you are already using
   port 3000 for something else, change this.  Also, make sure that
@@ -441,6 +448,3 @@ If you are running on localhost, the last test will fail with an Error.
 # See Also
 
 The CAS server is documented at <http://www.jasig.org/cas>.
-
-
-
