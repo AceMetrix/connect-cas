@@ -3,6 +3,7 @@
   "description": "Interact with a CAS server to validate client interaction",
   "version": "0.0.11",
   "author": "James E. Marca <jmarca@translab.its.uci.edu>",
+  "license": "MIT",
   "keywords": [
     "cas",
     "central authentication service",
@@ -14,6 +15,9 @@
   "engines": {
     "node": "*"
   },
+    "scripts": {
+        "test": "mocha"
+    },
   "dependencies": {
     "hiredis": "",
     "redis": "",
