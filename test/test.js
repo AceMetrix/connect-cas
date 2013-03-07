@@ -9,7 +9,8 @@ var env = process.env;
 var chost = process.env.CAS_HOST;
 var cuser = process.env.CAS_USER;
 var cpass = process.env.CAS_PASS;
-var casurl = 'https://'+chost + '/cas/login'
+var casservice = 'https://'+chost+'/'
+var casurl = casservice + 'cas/login'
 
 var testhost = env.CAS_VALIDATE_TEST_URL || '127.0.0.1'
 var testport = env.CAS_VALIDATE_TEST_PORT || 3000
@@ -44,10 +45,11 @@ function _setup_request(cb){
 function _login_handler(rq,callback){
     return function(e,r,b){
         // parse the body for the form url, with the correct jsessionid
+        //console.log(b)
         var form_regex = /id="fm1".*action="(.*)" method="post"/;
         var result = form_regex.exec(b)
         var opts={}
-        opts.url='https://cas.ctmlabs.net'+result[1]
+        opts.url=casservice+result[1]
         opts.form={'username':cuser
                   ,'password':cpass
                   ,'submit':'LOGIN'
@@ -63,6 +65,9 @@ function _login_handler(rq,callback){
             var v = value_regex.exec(result[0])
             opts.form[n[1]]=v[1]
         }
+        // console.log('opts is' )
+        // console.log(opts)
+        // console.log('--' )
         rq.post(opts,callback)
     }
 }
@@ -77,6 +82,8 @@ function cas_login_function(rq,callback){
                                    if(success_regex.test(b)){
                                        return callback()
                                    }else{
+                                       console.log(opts)
+                                       console.log(b)
                                        return callback('CAS login failed')
                                    }
                                }) )
@@ -125,7 +132,6 @@ describe('cas_validate.redirect',function(){
                              rq({url:'http://'+ testhost +':'+testport+'/'
                                 ,followRedirect:false}
                                ,function(e,r,b){
-                                   console.log({url:'http://'+ testhost +':'+testport+'/'})
                                     r.statusCode.should.equal(307)
                                     r.headers.location.should.equal(casurl+'?service=http%3A%2F%2F'+ testhost +'%3A'+testport+'%2Findex.html')
                                     should.not.exist(b)
@@ -149,6 +155,7 @@ describe('cas_validate.redirect',function(){
                              // set up a session with CAS server
                              cas_login_function(rq
                                                ,function(e){
+                                                    if(e) console.log(e)
                                                     return cb(e,rq)
                                                 })
                          }
@@ -683,7 +690,7 @@ describe('cas_validate.ssoff',function(){
     it('should delete the session when the user signs out of CAS server (single sign off)',function(done){
         if(testhost === '127.0.0.1'){
             // this test generally will fail unless CAS can post to this host
-            console.log('test aborted on 127.0.0.1.  Try re-running with the CAS_VALIDATE_TEST_URL set to a url that your CAS server can post to')
+            console.log('\ntest aborted on 127.0.0.1.  Try re-running with the CAS_VALIDATE_TEST_URL set to a url that your CAS server can post to')
             return done()
         }
 
