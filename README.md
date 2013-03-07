@@ -441,9 +441,36 @@ with
 
 Then run the tests with
 
+    npm test
+
+or
+
     make test
 
-If you are running on localhost, the last test will fail with an Error.
+(I do this to get the nyan cat reporter)
+
+If you are running on localhost, the last tests related to single sign
+off will be skipped.  The idea is that localhost isn't usually an
+address that can be hit by another machine, so the test should not be
+run.
+
+Instead, put the library on a machine with a URL (even a numeric one)
+that your CAS server can see and send a POST to.  This will more
+accurately model a real production environment.
+
+For example, if you have a server called `http://awesome.mycompany.net`
+you can run the test on port 3000 on this machine by typing
+
+```
+export CAS_VALIDATE_TEST_URL='awesome.mycompany.net'
+```
+
+Then all the tests will run, and they should all pass.  Assuming of
+course that you have a properly configured CAS server and identified
+it as noted above.  The only caveat is that waiting for the POST is
+slow, and so the test may timeout.  If this happens, try running with
+a longer timeout period (`mocha --timeout 50000 test`)
+
 
 # See Also
 
