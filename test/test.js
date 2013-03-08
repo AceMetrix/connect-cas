@@ -479,6 +479,140 @@ describe('cas_validate.redirect and cas_validate.ticket take two',function(){
 
 })
 
+describe('stacking multiple cas_validate.ticket handlers',function(){
+    var app,server
+
+    before(
+        function(done){
+            app = connect()
+            app.use(cas_validate.ssoff())
+            app.use(cas_validate.ticket({'cas_host':chost}))
+            app.use(cas_validate.ticket({'cas_host':chost}))
+            app.use(cas_validate.check_and_return({'cas_host':chost
+                                                  ,'service':'http://'+testhost+':'+testport+'/'}))
+            app.use(function(req, res, next){
+                        if(req.session.st){
+                            return res.end('hello '+req.session.name)
+                        }else{
+                            return res.end('hello world (not logged in)')
+                        }
+                    }
+                   )
+            var login = connect()
+            .use(connect.cookieParser('six foot barley at Waterloo'))
+            .use(connect.session({ store: new RedisStore }))
+            login.use('/login',cas_validate.check_or_redirect({'cas_host':chost
+                                                              ,'service':'http://'+testhost+':'+testport+'/'}))
+            login.use('/',app)
+
+            server = login.listen(testport,done)
+
+    })
+    after(function(done){
+        server.close(done)
+    })
+
+
+    it('should not crash, and should redirect when no session is established',function(done){
+        async.waterfall([function(cb){
+                             _setup_request(cb)
+                         }
+                        ,function(rq,cb){
+
+                             rq({url:'http://'+ testhost +':'+testport+'/login'
+                                ,followRedirect:false}
+                               ,function(e,r,b){
+                                    r.statusCode.should.equal(307)
+                                    r.headers.location.should.equal(casurl+'?service=http%3A%2F%2F'+ testhost +'%3A'+testport+'%2F')
+                                    should.not.exist(b)
+                                    cb()
+                                }
+                               )
+                         }]
+                       ,done
+                       )
+
+
+    })
+
+    it('should not crash, and should should redirect when no session is established part deux',function(done){
+        async.waterfall([function(cb){
+                             _setup_request(cb)
+                         }
+                        ,function(rq,cb){
+                             rq({url:'http://'+ testhost +':'+testport+'/'}
+                               ,function(e,r,b){
+                                    r.statusCode.should.equal(200)
+                                    should.exist(b)
+                                    b.should.equal('hello world (not logged in)')
+                                    cb(null, rq)
+                                }
+                               )
+                         }
+                        ,function(rq,cb){
+
+                             function all_done_handler(e,r,b){
+                                 r.statusCode.should.equal(200)
+                                 should.exist(b)
+                                 b.should.equal('hello '+cuser)
+                                 cb(e)
+                             }
+
+                             function redirect_handler(e,r,b){
+                                 r.statusCode.should.equal(302)
+                                 rq.get(r.headers.location
+                                       ,all_done_handler)
+                             }
+
+                             var form_handler = _login_handler(rq
+                                                              ,redirect_handler)
+                             rq({url:'http://'+ testhost +':'+testport+'/login'
+                                ,followRedirect:true}
+                               ,function(e,r,b){
+                                    r.statusCode.should.equal(200)
+                                    form_handler(e,r,b)
+                                }
+                               )
+                         }
+
+                        ]
+                       ,done
+                       )
+
+
+    })
+
+    it('should not crash, and should should not redirect when a session is established',function(done){
+
+        async.waterfall([function(cb){
+                             _setup_request(cb)
+                         }
+                        ,function(rq,cb){
+
+                             // set up a session with CAS server
+                             cas_login_function(rq
+                                               ,function(e){
+                                                    return cb(e,rq)
+                                                })
+                         }
+                        ,function(rq,cb){
+                             rq({url:'http://'+ testhost +':'+testport+'/'}
+                               ,function(e,r,b){
+                                 r.statusCode.should.equal(200)
+                                 should.exist(b)
+                                 b.should.equal('hello '+cuser)
+                                 cb(e)
+                                }
+                               )
+
+                         }]
+                       ,done
+                       )
+
+    })
+
+})
+
 
 describe('cas_validate.username',function(){
 
