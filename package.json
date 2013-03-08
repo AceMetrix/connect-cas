@@ -22,7 +22,8 @@
     "hiredis": "",
     "redis": "",
     "underscore": "",
-    "request": ""
+    "request": "",
+    "winston":""
   },
   "devDependencies": {
     "mocha": "*",
