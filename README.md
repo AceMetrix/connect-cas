@@ -471,6 +471,21 @@ it as noted above.  The only caveat is that waiting for the POST is
 slow, and so the test may timeout.  If this happens, try running with
 a longer timeout period (`mocha --timeout 50000 test`)
 
+# Logging
+
+This package uses [winston](https://github.com/flatiron/winston).  Not
+well, but anyway, there it is.  Basically, if you want lots of output,
+set the `NODE_ENV` environment variable to 'development'.  If you are
+running in production, set `NODE_ENV` to 'production'.  This also
+meshes well with Express usage of the `NODE_ENV` variable.  Finally,
+if something weird is going on in production, you can also set the log
+level explicitly, by setting either `CAS_VALIDATE_LOG_LEVEL` or
+'LOGLEVEL` to the usual ['debug','info','warn','error'].
+
+In the code most noisy alerts are at the debug level, and then most
+errors are at the error level, but maybe in the future I'll add finer
+grained message levels.
+
 
 # See Also
 
