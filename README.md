@@ -480,11 +480,12 @@ running in production, set `NODE_ENV` to 'production'.  This also
 meshes well with Express usage of the `NODE_ENV` variable.  Finally,
 if something weird is going on in production, you can also set the log
 level explicitly, by setting either `CAS_VALIDATE_LOG_LEVEL` or
-'LOGLEVEL` to the usual ['debug','info','warn','error'].
+`LOGLEVEL` to the usual ['debug','info','warn','error'] (although this 
+hasn't been tested)
 
-In the code most noisy alerts are at the debug level, and then most
-errors are at the error level, but maybe in the future I'll add finer
-grained message levels.
+In the code noisy alerts are at the debug level, and then errors are 
+at the error level, but maybe in the future I'll add finer grained 
+message levels.
 
 
 # See Also
