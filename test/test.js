@@ -6,9 +6,9 @@ var querystring = require('querystring');
 var redis = require("redis");
 
 var env = process.env;
-var chost = process.env.CAS_HOST;
-var cuser = process.env.CAS_USER;
-var cpass = process.env.CAS_PASS;
+var chost = env.CAS_HOST;
+var cuser = env.CAS_USER;
+var cpass = env.CAS_PASS;
 var casservice = 'https://'+chost+'/'
 var casurl = casservice + 'cas/login'
 
