@@ -1,7 +1,7 @@
 {
   "name": "cas_validate",
   "description": "Interact with a CAS server to validate client interaction",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "author": "James E. Marca <jmarca@translab.its.uci.edu>",
   "license": "MIT",
   "keywords": [
@@ -15,15 +15,15 @@
   "engines": {
     "node": "*"
   },
-    "scripts": {
-        "test": "NODE_ENV='test' mocha --timeout 15000 -R list --bail"
-    },
+  "scripts": {
+    "test": "NODE_ENV='test' mocha --timeout 15000 -R list --bail"
+  },
   "dependencies": {
     "hiredis": "",
     "redis": "",
     "underscore": "",
     "request": "",
-    "winston":""
+    "winston": ""
   },
   "devDependencies": {
     "mocha": "*",
