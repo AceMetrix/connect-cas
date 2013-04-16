@@ -1,7 +1,7 @@
 {
   "name": "cas_validate",
   "description": "Interact with a CAS server to validate client interaction",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "author": "James E. Marca <jmarca@translab.its.uci.edu>",
   "license": "MIT",
   "keywords": [
@@ -33,5 +33,5 @@
     "express": "*",
     "async": "*"
   },
-  "repository": "git://github.com/jmarca/cas_validate"
+  "repository": "https://github.com/jmarca/cas_validate.git"
 }
