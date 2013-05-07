@@ -19,8 +19,6 @@
     "test": "NODE_ENV='test' mocha --timeout 15000 -R list --bail"
   },
   "dependencies": {
-    "hiredis": "",
-    "redis": "",
     "underscore": "",
     "request": "",
     "winston": ""
