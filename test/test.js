@@ -3,7 +3,6 @@ var parseUrl = require('url').parse;
 var http = require('http');
 var request = require('request');
 var querystring = require('querystring');
-var _ = require('underscore');
 var async = require('async')
 var express = require('express')
 var connect = require('connect')
@@ -91,19 +90,18 @@ describe.only('cas_validate',function(){
                 done();
             });
         })
-        describe('when a ticket is passed', function(){
-            it('should throw a 403 when ticket invalid', function(done){
-                http.get('http://localhost:3000/?ticket=invalidTicket', function(response){
-                    response.statusCode.should.equal(403);
-                    done();
-                });
+        it('should redirect to login when ticket invalid', function(done){
+            http.get('http://localhost:3000/?ticket=invalidTicket', function(response){
+                response.statusCode.should.equal(307);
+                response.headers.location.should.equal('http://localhost:1337/cas/login?service=http%3A%2F%2Flocalhost%3A3000%2F');
+                done();
             });
-            it('should issue a redirection to original url when ticket is valid', function(done){
-                http.get('http://localhost:3000/somePath?ticket=validTicket', function(response){
-                    response.statusCode.should.equal(307);
-                    response.headers.location.should.equal('/somePath?');
-                    done();
-                });
+        });
+        it('should redirect to original url when ticket is valid', function(done){
+            http.get('http://localhost:3000/somePath?ticket=validTicket', function(response){
+                response.statusCode.should.equal(307);
+                response.headers.location.should.equal('http://localhost:1337/somePath?');
+                done();
             });
         });
     });
