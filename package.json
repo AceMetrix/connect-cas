@@ -16,20 +16,20 @@
     "node": "*"
   },
   "scripts": {
-    "test": "NODE_ENV='test' mocha --timeout 15000 -R list --bail"
+    "test": "./node_modules/.bin/mocha test/test.js"
   },
   "dependencies": {
-    "underscore": "",
-    "request": "",
-    "winston": ""
+    "underscore": "~1.4.4",
+    "request": "~2.20.0",
+    "winston": "~0.7.1"
   },
   "devDependencies": {
-    "mocha": "*",
-    "should": "*",
-    "connect": "*",
+    "mocha": "~1.9.0",
+    "should": "~1.2.2",
+    "connect": "~2.7.6",
     "connect-redis": "*",
-    "express": "*",
-    "async": "*"
+    "express": "~3.2.0",
+    "async": "~0.2.7"
   },
   "repository": "https://github.com/jmarca/cas_validate.git"
 }
