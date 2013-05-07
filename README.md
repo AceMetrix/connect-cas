@@ -34,7 +34,7 @@ var cas_validate = require('cas_validate');
 var app = connect()
             .use(connect.cookieParser('barley wheat napoleon'))
             .use(connect.session({ store: new RedisStore }))
-            .use(cas_validate.redirect({'cas_host':'my.cas.host.net'})
+            .use(cas_validate.redirect({host:'my.cas.host.net'})
             .use(function(req, res, next){
                       res.end('hello world')
                  });
@@ -54,7 +54,7 @@ operations such as
 
 they should work fine.
 
-Second, the `cas_host` option currently just wants the host.  I prepend
+Second, the `host` option currently just wants the host.  I prepend
 `https://` to this host.  If you aren't using https for your CAS
 server, then you're out of luck for using this library.
 
@@ -84,7 +84,28 @@ $ npm install ~/my/github/repos/cas_validate
 
 # Exported Functions
 
-## `ticket`
+## `configure (options)`
+
+Override the default options.  These are also the list of options you can pass to each exported function.  Here's the list of defaults:
+
+```javascript
+var defaults = { 
+    host: undefined, // cas host
+    client: undefined, // service client
+    gateway: undefined,
+    uris: {
+        validate: '/cas/validate',               // not implemented
+        serviceValidate: '/cas/serviceValidate', // CAS 2.0
+        proxyValidate: '/cas/proxyValidate',     // not implemented
+        proxy: '/cas/proxy',                     // not implemented
+        login: '/cas/login',
+        logout: '/cas/logout'
+    }   
+}
+```
+
+
+## `ticket (options)`
 
 The `ticket` function is crucial to handling CAS sessions.  It will
 consume the service ticket from the CAS server, verify that it is
@@ -94,37 +115,11 @@ sign out POST messages.  If there is no service ticket in the request,
 or if the service ticket is not valid, this function will simply pass
 control along to the next connect middleware in the web stack.
 
-### Options
-
-* `cas_host`: the CAS hostname, without the 'https://' part and
-  without the '/cas/login' part.  Something like `cas.example.net`.
-  The default is to read the CAS_HOST environment variable.  This
-  option, if set, will override the default.
-
-* `service`: the service for which the service ticket was issued.  If
-  used in the same route as the `check_...` part of the function, then
-  this parameter can be left to its default, and the correct value
-  will be deduced from the request parameters.  In some cases it might
-  be necessary to specify this value.
-
-## `check_or_redirect`
+## `check_or_redirect (options)`
 
 The `check_or_redirect` function is probably the most useful one.
 Used in conjunction with the `ticket` function, it will enable
 CAS-based authentication.
-
-### Options
-
-* `cas_host`: the CAS hostname, without the 'https://' part and
-  without the '/cas/login' part.  Something like `cas.example.net`.
-  The default is to read the CAS_HOST environment variable.  This
-  option, if set, will override the default.
-
-* `service`: the service for which the service ticket will be issued,
-  and to which the CAS server will redirect the request after the user
-  has logged in.  The default is to figure out the service from the
-  incoming request, but one may want to redirect the incoming request
-  somewhere else.
 
 ### Example
 
@@ -133,10 +128,10 @@ below, modified from the test suite.
 
 
 ```javascript
-
+cas_validate.configure({host:chost, client: 'http://' + testhost + ':' + testport + '/'})
 app = connect()
 app.use(cas_validate.ssoff())
-app.use(cas_validate.ticket({'cas_host':chost}))
+app.use(cas_validate.ticket())
 app.use(function(req, res, next){
             if(req.session.st){
                 return res.end('hello '+req.session.name)
@@ -148,8 +143,7 @@ app.use(function(req, res, next){
 var login = connect()
 login.use(connect.cookieParser('six foot barley at Waterloo'))
 login.use(connect.session({ store: new RedisStore }))
-login.use('/login',cas_validate.check_or_redirect({'cas_host':chost
-                                                  ,'service':'http://'+testhost+':'+testport+'/'}))
+login.use('/login',cas_validate.check_or_redirect())
 login.use('/',app)
 
 server = login.listen(testport,done)
@@ -172,7 +166,7 @@ the path listed in the `service` parameter.  So if you only want to
 allow POST requests to a certain address, that is another reason to
 specify the service parameter.
 
-## `check_and_return`
+## `check_and_return (options)`
 
 The `check_and_return` function is somewhat useful.  The idea is to
 exploit the feature in the CAS server that listens for a
@@ -180,22 +174,17 @@ exploit the feature in the CAS server that listens for a
 ticket if the client has a valid CAS session, and will return nothing
 if not.
 
-### Options
-
-The same options as `check_or_redirect`, above
-
 ### Example
 
 The previous example has been modified below to use check_and_return
 instead of check_or_redirect
 
 ```javascript
-
+cas_validate.configure({host:chost, client: 'http://' + testhost + ':' + testport + '/'})
 app = connect()
 app.use(cas_validate.ssoff())
-app.use(cas_validate.ticket({'cas_host':chost}))
-app.use(cas_validate.check_and_return({'cas_host':chost
-                                      ,'service':'http://'+testhost+':'+testport+'/'}))
+app.use(cas_validate.ticket())
+app.use(cas_validate.check_and_return())
 app.use(function(req, res, next){
             if(req.session.st){
                 return res.end('hello '+req.session.name)
@@ -207,8 +196,7 @@ app.use(function(req, res, next){
 var login = connect()
 login.use(connect.cookieParser('six foot barley at Waterloo'))
 login.use(connect.session({ store: new RedisStore }))
-login.use('/login',cas_validate.check_or_redirect({'cas_host':chost
-                                                  ,'service':'http://'+testhost+':'+testport+'/'}))
+login.use('/login',cas_validate.check_or_redirect())
 login.use('/',app)
 
 server = login.listen(testport,done)
@@ -240,24 +228,20 @@ with every request, which will greatly slow down the performance of
 your system.
 
 
-## `redirect`
+## `redirect (options)`
 
 `redirect` is a somewhat lame filter, but it can be useful.  All it
 does is redirect incoming queries to the CAS login page.  Even if the
 session has been established, it will always ignore that fact and
 bounce the request.
 
-## `ssoff`
+## `ssoff (options)`
 
 The `ssoff` service will listen for incoming POST messages from the
 CAS server and will delete sessions as appropriate.
 
 Do *not* put this service after the `check_or_redirect` service, or the
 CAS server POSTs will get redirected to the CAS server to log in!
-
-### Options
-
-No options
 
 ### Example
 
@@ -282,26 +266,13 @@ You can use this with the `ssoff` service to enable logging out from
 your application directly, or indirectly from some other CAS enabled
 app.
 
-### Options
-
-* `cas_host`: the CAS hostname, without the 'https://' part and
-  without the '/cas/logout' part.  Something like `cas.example.net`.
-  The default is to read the CAS_HOST environment variable.  This
-  option, if set, will override the default.
-
-* `service`: the service for which the service ticket will be issued,
-  and to which the CAS server will redirect the request after the user
-  has logged in.  The default is to figure out the service from the
-  incoming request, but one may want to redirect the incoming request
-  somewhere else.
-
-
 ### Example
 
 As usual, check out the test for a complete example.  Cut and paste below:
 
 ```javascript
 
+cas_validate.configure({host:'my.cas.host', client: 'http://' + testhost + ':' + testport + '/'})
 app = connect()
     .use(connect.bodyParser())
       .use(connect.cookieParser('barley Waterloo Napoleon loser'))
@@ -309,13 +280,10 @@ app = connect()
 
 app.use('/username',cas_validate.username)
 
-app.use('/quit',cas_validate.logout({'cas_host':'my.cas.host'
-                                    ,'service':'http://myhost.com'}))
+app.use('/quit',cas_validate.logout())
 app.use(cas_validate.ssoff())
-app.use(cas_validate.ticket({'cas_host':'my.cas.host'
-                             ,'service':'http://myhost.com'}))
-app.use(cas_validate.check_and_return({'cas_host':'my.cas.host'
-                                      ,'service':'http://myhost.com'}))
+app.use(cas_validate.ticket({host:'my.cas.host'}))
+app.use(cas_validate.check_and_return())
 
 app.use(function(req, res, next){
             if(req.session.st){
@@ -328,42 +296,14 @@ app.use(function(req, res, next){
 var login = connect()
 .use(connect.cookieParser('six foot barley at Waterloo'))
 .use(connect.session({ store: new RedisStore }))
-login.use('/login',cas_validate.check_or_redirect({'cas_host':'my.cas.host'
-                                                  ,'service':'http://myhost.com'}))
+login.use('/login',cas_validate.check_or_redirect())
 login.use('/',app)
 server=login.listen(testport
                    ,done)
 
 ```
 
-
-## `username`
-
-A simple service to spit back the current logged in user's username as
-a JSON object, or null.
-
-Either:
-
-```javascript
-
-return res.end(JSON.stringify({'user':req.session.name}));
-
-```
-
-or
-
-```javascript
-
-return res.end(JSON.stringify({'user':null}));
-
-```
-
-### Options
-
-No options
-
-
-## `session_or_abort`
+## `session_or_abort (options)`
 
 The `session_or_abort` service no longer works with Connect, as
 routing has been removed.  This is the only feature that requires
@@ -378,9 +318,6 @@ in users, and others to those who are not logged in, without having to
 resort to multiple paths or lots of `if` statements in your server
 code.
 
-### Options
-
-No options
 
 ### Example
 
