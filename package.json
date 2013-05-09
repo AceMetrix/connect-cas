@@ -1,13 +1,15 @@
 {
-  "name": "cas_validate",
-  "description": "Interact with a CAS server to validate client interaction",
-  "version": "0.0.14",
-  "author": "James E. Marca <jmarca@translab.its.uci.edu>",
+  "name": "connect-cas",
+  "description": "Connect middleware for a node CAS client",
+  "version": "0.1.0",
+  "author": "Duncan Wong <baduncaduncan@gmail.com>",
   "license": "MIT",
   "keywords": [
     "cas",
     "central authentication service",
-    "authentication"
+    "authentication",
+    "connect",
+    "middlware"
   ],
   "directories": {
     "lib": "./lib"
@@ -16,20 +18,16 @@
     "node": "*"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha test/test.js"
+    "test": "./node_modules/.bin/mocha --reporter spec test/test.js"
   },
   "dependencies": {
-    "underscore": "~1.4.4",
-    "request": "~2.20.0",
-    "winston": "~0.7.1"
+    "underscore": "~1.4.4"
   },
   "devDependencies": {
     "mocha": "~1.9.0",
     "should": "~1.2.2",
     "connect": "~2.7.6",
-    "connect-redis": "*",
-    "express": "~3.2.0",
-    "async": "~0.2.7"
+    "express": "~3.2.0"
   },
-  "repository": "https://github.com/jmarca/cas_validate.git"
+  "repository": "https://github.com/badunk/connect-cas.git"
 }
