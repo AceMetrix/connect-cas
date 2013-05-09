@@ -1,11 +1,11 @@
-var should = require('should')
+var should = require('should');
 var parseUrl = require('url').parse;
 var http = require('http');
 var querystring = require('querystring');
-var express = require('express')
-var connect = require('connect')
+var express = require('express');
+var connect = require('connect');
 
-var cas = require('../lib/cas_validate')
+var cas = require('../lib/connect-cas');
 var options = {
     protocol: 'http',
     hostname: 'localhost',
@@ -53,7 +53,7 @@ var serverSetup = function(methodName, done){
     return server;
 };
 
-describe('cas_validate',function(){
+describe('connect-cas',function(){
     var casServer;
     var server;
 
@@ -140,7 +140,7 @@ describe('cas_validate',function(){
             });
         });
     });
-    describe('#ssout', function(){
+    xdescribe('#ssout', function(){
         before(function(done){
             server = serverSetup('ssout', done);
         });
