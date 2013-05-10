@@ -18,7 +18,7 @@
     "node": "*"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha --reporter spec test/test.js"
+    "test": "./node_modules/.bin/mocha --reporter list test/test.js"
   },
   "dependencies": {
     "underscore": "~1.4.4"

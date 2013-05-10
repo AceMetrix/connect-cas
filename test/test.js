@@ -4,6 +4,7 @@ var http = require('http');
 var querystring = require('querystring');
 var express = require('express');
 var connect = require('connect');
+var RedisStore = require('connect-redis')(express);
 
 var cas = require('../lib/connect-cas');
 var options = {
@@ -30,19 +31,22 @@ var casServerSetup = function(done){
 };
 var createSession = function(callback) {
     http.get('http://localhost:3000/?ticket=validTicket', function(response){
-        var data = '';
-        response.on('data', function(chunk){
-            data += chunk;
-        });
-        response.on('end', function(){
-            callback(response.headers['set-cookie']);
-        });
+        callback(response.headers['set-cookie']);
     });
 }
 
 var serverSetup = function(methodName, done){
     var app = connect()
     .use(connect.cookieParser('barley wheat napoleon'))
+    /*
+    .use(connect.session({
+        store: new RedisStore({
+                   host: '127.0.0.1',
+            port: 6379,
+            ttl: 3600
+               })
+    }))
+    */
     .use(connect.cookieSession())
     .use(cas[methodName]())
     .use(function(req, res, next){
@@ -68,16 +72,16 @@ describe('connect-cas',function(){
         after(function(done){
             server.close(done)
         });
-        describe('when ticket is presented', function(){
-            describe('and ticket is invalid', function(){
-                it('should redirect to login when no session', function(done){
+        describe('when ticket presented', function(){
+            describe('and ticket invalid', function(){
+                it('redirect to login when no session', function(done){
                     http.get('http://localhost:3000/?ticket=invalidTicket', function(response){
                         response.statusCode.should.equal(307);
                         response.headers.location.should.equal('http://localhost:1337/cas/login?service=http%3A%2F%2Flocalhost%3A3000%2F');
                         done();
                     });
                 });
-                it('should redirect to original url when existing session', function(done){
+                it('redirect to original url if session exists', function(done){
                     createSession(function(cookie){
                         http.get({host: 'localhost', port: 3000, path: '/?ticket=invalidTicket', headers: {cookie: cookie}}, function(response){
                             response.statusCode.should.equal(303);
@@ -87,7 +91,7 @@ describe('connect-cas',function(){
                     });
                 });
             });
-            it('should redirect to original url when ticket is valid', function(done){
+            it('redirect to original url if ticket valid', function(done){
                 http.get('http://localhost:3000/somePath?ticket=validTicket', function(response){
                     response.statusCode.should.equal(303);
                     response.headers.location.should.equal('http://localhost:3000/somePath');
@@ -95,16 +99,17 @@ describe('connect-cas',function(){
                 });
             });
         });
-        describe('when no ticket is presented', function(){
-            describe('and gateway is turned off', function(){
-                it('should redirect to login when no session', function(done){
-                    http.get('http://localhost:3000/?ticket=invalidTicket', function(response){
+        describe('when no ticket presented', function(){
+            describe('and gateway turned off', function(){
+                it('redirect to login when no session', function(done){
+                    http.get('http://localhost:3000/', function(response){
                         response.statusCode.should.equal(307);
                         response.headers.location.should.equal('http://localhost:1337/cas/login?service=http%3A%2F%2Flocalhost%3A3000%2F');
+                        should.not.exist(response.headers['set-cookie']);
                         done();
                     });
                 });
-                it('should continue when existing session', function(done){
+                it('continue if session exists', function(done){
                     createSession(function(cookie){
                         http.get({host: 'localhost', port: 3000, headers: {cookie: cookie}}, function(response){
                             response.statusCode.should.equal(200);
@@ -113,14 +118,14 @@ describe('connect-cas',function(){
                     });
                 });
             });
-            describe('and gateway is turned on', function(){
+            describe('and gateway turned on', function(){
                 before(function(){
                     cas.configure({gateway: true});
                 });
                 after(function(){
                     cas.configure({gateway: false});
                 });
-                it('it should redirect to login with gateway param', function(done){
+                it('redirect to login with gateway param', function(done){
                     http.get('http://localhost:3000/', function(response){
                         response.statusCode.should.equal(307);
                         var query = querystring.parse(parseUrl(response.headers.location).query);
@@ -128,7 +133,7 @@ describe('connect-cas',function(){
                         done();
                     });
                 });
-                it('should continue if already redirected once with gateway', function(done){
+                it('continue if already redirected', function(done){
                     http.get('http://localhost:3000', function(response){
                         var cookie = response.headers['set-cookie'];
                         http.get({host: 'localhost', port: 3000, headers: {cookie: cookie}}, function(response){
