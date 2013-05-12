@@ -38,16 +38,13 @@ var createSession = function(callback) {
 var serverSetup = function(methodName, done){
     var app = connect()
     .use(connect.cookieParser('barley wheat napoleon'))
-    /*
     .use(connect.session({
-        store: new RedisStore({
-                   host: '127.0.0.1',
-            port: 6379,
-            ttl: 3600
-               })
+       store: new RedisStore({
+           host: '127.0.0.1',
+           port: 6379,
+           ttl: 3600
+       })
     }))
-    */
-    .use(connect.cookieSession())
     .use(cas[methodName]())
     .use(function(req, res, next){
         res.end('hello world');

@@ -1,7 +1,7 @@
 {
   "name": "connect-cas",
   "description": "Connect middleware for a node CAS client",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "author": "Duncan Wong <baduncaduncan@gmail.com>",
   "license": "MIT",
   "keywords": [
@@ -27,7 +27,8 @@
     "mocha": "~1.9.0",
     "should": "~1.2.2",
     "connect": "~2.7.6",
-    "express": "~3.2.0"
+    "express": "~3.2.0",
+    "xml2js": "~0.2.7"
   },
   "repository": "https://github.com/badunk/connect-cas.git"
 }
