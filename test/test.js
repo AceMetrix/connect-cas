@@ -12,7 +12,7 @@ var options = {
     hostname: 'localhost',
     port: 1337 
 }
-cas.configure(options);
+cas.defaults(options);
 
 // create a fake CAS server
 var casServerSetup = function(done){
@@ -61,7 +61,7 @@ describe('connect-cas',function(){
     before(function(done){
         casServer = casServerSetup(done);
     });
-    xdescribe('#configure', function(){});
+    xdescribe('#defaults', function(){});
     describe('#ticket', function(){
         before(function(done){
             server = serverSetup('ticket', done);
@@ -117,10 +117,10 @@ describe('connect-cas',function(){
             });
             describe('and gateway turned on', function(){
                 before(function(){
-                    cas.configure({gateway: true});
+                    cas.defaults({gateway: true});
                 });
                 after(function(){
-                    cas.configure({gateway: false});
+                    cas.defaults({gateway: false});
                 });
                 it('redirect to login with gateway param', function(done){
                     http.get('http://localhost:3000/', function(response){
