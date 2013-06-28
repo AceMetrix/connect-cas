@@ -1,6 +1,7 @@
 var should = require('should');
 var parseUrl = require('url').parse;
 var http = require('http');
+var https = require('https');
 var querystring = require('querystring');
 var express = require('express');
 var connect = require('connect');
@@ -74,7 +75,7 @@ describe('connect-cas',function(){
                 it('redirect to login when no session', function(done){
                     http.get('http://localhost:3000/?ticket=invalidTicket', function(response){
                         response.statusCode.should.equal(307);
-                        response.headers.location.should.equal('http://localhost:1337/cas/login?service=http%3A%2F%2Flocalhost%3A3000%2F');
+                        response.headers.location.should.equal('http://localhost:1337/cas/login?service=https%3A%2F%2Flocalhost%3A3000%2F');
                         done();
                     });
                 });
@@ -82,7 +83,7 @@ describe('connect-cas',function(){
                     createSession(function(cookie){
                         http.get({host: 'localhost', port: 3000, path: '/?ticket=invalidTicket', headers: {cookie: cookie}}, function(response){
                             response.statusCode.should.equal(303);
-                            response.headers.location.should.equal('http://localhost:3000/');
+                            response.headers.location.should.equal('https://localhost:3000/');
                             done();
                         });
                     });
@@ -91,7 +92,7 @@ describe('connect-cas',function(){
             it('redirect to original url if ticket valid', function(done){
                 http.get('http://localhost:3000/somePath?ticket=validTicket', function(response){
                     response.statusCode.should.equal(303);
-                    response.headers.location.should.equal('http://localhost:3000/somePath');
+                    response.headers.location.should.equal('https://localhost:3000/somePath');
                     done();
                 });
             });
@@ -101,7 +102,7 @@ describe('connect-cas',function(){
                 it('redirect to login when no session', function(done){
                     http.get('http://localhost:3000/', function(response){
                         response.statusCode.should.equal(307);
-                        response.headers.location.should.equal('http://localhost:1337/cas/login?service=http%3A%2F%2Flocalhost%3A3000%2F');
+                        response.headers.location.should.equal('http://localhost:1337/cas/login?service=https%3A%2F%2Flocalhost%3A3000%2F');
                         should.not.exist(response.headers['set-cookie']);
                         done();
                     });
