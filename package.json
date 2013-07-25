@@ -1,7 +1,7 @@
 {
   "name": "connect-cas",
   "description": "Connect middleware for a node CAS client",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "author": "Duncan Wong <baduncaduncan@gmail.com>",
   "license": "MIT",
   "keywords": [
@@ -31,5 +31,5 @@
     "xml2js": "~0.2.7",
     "connect-redis": "~1.4.5"
   },
-  "repository": "https://github.com/badunk/connect-cas.git"
+  "repository": "https://github.com/acemetrix/connect-cas.git"
 }
