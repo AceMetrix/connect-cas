@@ -5,7 +5,6 @@ var https = require('https');
 var querystring = require('querystring');
 var express = require('express');
 var connect = require('connect');
-var RedisStore = require('connect-redis')(express);
 
 var cas = require('../lib/connect-cas');
 var options = {
@@ -38,13 +37,10 @@ var createSession = function(callback) {
 
 var serverSetup = function(methodName, done){
     var app = connect()
-    .use(connect.cookieParser('barley wheat napoleon'))
+    .use(connect.cookieParser())
     .use(connect.session({
-       store: new RedisStore({
-           host: '127.0.0.1',
-           port: 6379,
-           ttl: 3600
-       })
+        secret: 'ninja cat',
+        key: 'sid'
     }))
     .use(cas[methodName]())
     .use(function(req, res, next){
@@ -75,7 +71,7 @@ describe('connect-cas',function(){
                 it('redirect to login when no session', function(done){
                     http.get('http://localhost:3000/?ticket=invalidTicket', function(response){
                         response.statusCode.should.equal(307);
-                        response.headers.location.should.equal('http://localhost:1337/cas/login?service=https%3A%2F%2Flocalhost%3A3000%2F');
+                        response.headers.location.should.equal('http://localhost:1337/cas/login?service=http%3A%2F%2Flocalhost%3A3000%2F');
                         done();
                     });
                 });
@@ -83,7 +79,7 @@ describe('connect-cas',function(){
                     createSession(function(cookie){
                         http.get({host: 'localhost', port: 3000, path: '/?ticket=invalidTicket', headers: {cookie: cookie}}, function(response){
                             response.statusCode.should.equal(303);
-                            response.headers.location.should.equal('https://localhost:3000/');
+                            response.headers.location.should.equal('http://localhost:3000/');
                             done();
                         });
                     });
@@ -92,7 +88,7 @@ describe('connect-cas',function(){
             it('redirect to original url if ticket valid', function(done){
                 http.get('http://localhost:3000/somePath?ticket=validTicket', function(response){
                     response.statusCode.should.equal(303);
-                    response.headers.location.should.equal('https://localhost:3000/somePath');
+                    response.headers.location.should.equal('http://localhost:3000/somePath');
                     done();
                 });
             });
@@ -102,7 +98,7 @@ describe('connect-cas',function(){
                 it('redirect to login when no session', function(done){
                     http.get('http://localhost:3000/', function(response){
                         response.statusCode.should.equal(307);
-                        response.headers.location.should.equal('http://localhost:1337/cas/login?service=https%3A%2F%2Flocalhost%3A3000%2F');
+                        response.headers.location.should.equal('http://localhost:1337/cas/login?service=http%3A%2F%2Flocalhost%3A3000%2F');
                         should.not.exist(response.headers['set-cookie']);
                         done();
                     });
