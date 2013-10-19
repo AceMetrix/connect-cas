@@ -20,7 +20,7 @@ var casServerSetup = function(done){
     app.get('/cas/serviceValidate', function(req, res){
         var response = '';
         if (req.query.ticket === 'validTicket'){
-            response = '<cas:serviceResponse xmlns:cas="http:/www.yale.edu/tp.cas"><cas:authenticationSuccess><cas:user>username</cas:user></cas:authenticationSuccess></cas:serviceResponse>';
+            response = '<cas:serviceResponse xmlns:cas="http:/www.yale.edu/tp.cas"><cas:authenticationSuccess><cas:user>somebody@gmail.com</cas:user></cas:authenticationSuccess></cas:serviceResponse>';
         } else{
             response = '<cas:serviceResponse xmlns:cas="http://www.yale.edu/tp/cas"><cas:authenticationFailure code="INVALID_TICKET">Ticket ST-1856339-aA5Yuvrxzpv8Tau1cYQ7 not recognized</cas:authenticationFailure></cas:serviceResponse>';
         }
@@ -35,6 +35,7 @@ var createSession = function(callback) {
     });
 }
 
+var lastRequest;
 var serverSetup = function(methodName, done){
     var app = connect()
     .use(connect.cookieParser())
@@ -42,6 +43,10 @@ var serverSetup = function(methodName, done){
         secret: 'ninja cat',
         key: 'sid'
     }))
+    .use(function(req, res, next){
+        lastRequest = req;
+        next();
+    })
     .use(cas[methodName]())
     .use(function(req, res, next){
         res.end('hello world');
@@ -89,6 +94,12 @@ describe('connect-cas',function(){
                 http.get('http://localhost:3000/somePath?ticket=validTicket', function(response){
                     response.statusCode.should.equal(303);
                     response.headers.location.should.equal('http://localhost:3000/somePath');
+                    done();
+                });
+            });
+            it('parses out username with email address format', function(done){
+                http.get('http://localhost:3000/somePath?ticket=validTicket', function(response){
+                    lastRequest.session.name.should.equal('somebody@gmail.com');
                     done();
                 });
             });
