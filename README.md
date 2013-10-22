@@ -1,6 +1,6 @@
 # Connect CAS
 
-Connect cas is a connect-based middleware that allows you to authenticate through a CAS 2.0+ server.  It supports the gateway feature in addition to the single sign off feature in CAS 3.0.
+Connect cas is a connect-based middleware that allows you to authenticate through a CAS 2.0+ server.  It supports the gateway feature.
 
 Adapted from https://github.com/jmarca/cas_validate
 
