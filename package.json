@@ -21,7 +21,8 @@
     "test": "./node_modules/.bin/mocha --reporter list test/*.spec.js"
   },
   "dependencies": {
-    "underscore": "~1.4.4"
+    "underscore": "~1.4.4",
+    "request": "~2.30.0"
   },
   "devDependencies": {
     "mocha": "~1.9.0",
