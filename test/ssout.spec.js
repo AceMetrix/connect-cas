@@ -53,6 +53,7 @@ var serverSetup = function(methodName, done){
         next();
     })
     .use(cas[methodName]())
+    .use(cas.authenticate())
     .use(function(req, res, next){
         res.end('hello world');
     });

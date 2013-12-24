@@ -1,10 +1,11 @@
 var express = require('express');
 var connect = require('connect');
 var cas = require('../');
-var http = require('http');
 var should = require('should');
 var querystring = require('querystring');
 var parseUrl = require('url').parse;
+var request = require('request');
+var http = require('http');
 
 cas.configure({
     protocol: 'http',
@@ -24,90 +25,44 @@ describe('#serviceValidate', function(){
         server.close(done);
     });
     describe('when ticket presented', function(){
-        describe('and ticket invalid', function(){
-            it('redirect to login when no session', function(done){
-                http.get('http://localhost:3000/?ticket=invalidTicket', function(response){
-                    response.statusCode.should.equal(307);
-                    response.headers.location.should.equal('http://localhost:1337/cas/login?service=http%3A%2F%2Flocalhost%3A3000%2F');
+        it('success if ticket valid', function(done){
+            request.get({uri: 'http://localhost:3000/somePath?ticket=validTicket', followRedirect: false}, function(err, response){
+                response.statusCode.should.equal(200);
+                done();
+            });
+        });
+        it('redirect to login when no session and ticket invalid', function(done){
+            request.get({uri: 'http://localhost:3000/?ticket=invalidTicket', followRedirect: false}, function(err, response){
+                response.statusCode.should.equal(307);
+                response.headers.location.should.equal('http://localhost:1337/cas/login?service=http%3A%2F%2Flocalhost%3A3000%2F');
+                done();
+            });
+        });
+        it('success if session exists even if ticket invalid', function(done){
+            var j = request.jar();
+            createSession(j, function(cookie){
+                request.get({uri: 'http://localhost:3000/?ticket=invalidTicket', jar: j, followRedirect: false}, function(err, response){
+                    response.statusCode.should.equal(200);
                     done();
                 });
             });
-            it('redirect to original url if session exists', function(done){
-                createSession(function(cookie){
-                    http.get({host: 'localhost', port: 3000, path: '/?ticket=invalidTicket', headers: {cookie: cookie}}, function(response){
-                        response.statusCode.should.equal(303);
-                        response.headers.location.should.equal('http://localhost:3000/');
-                        done();
-                    });
-                });
-            });
-        });
-        it('redirects to original url if ticket valid', function(done){
-            http.get('http://localhost:3000/somePath?ticket=validTicket', function(response){
-                response.statusCode.should.equal(303);
-                response.headers.location.should.equal('http://localhost:3000/somePath');
-                done();
-            });
-        });
-        it('retains the original querystring except for ?ticket', function(done){
-            http.get('http://localhost:3000/somePath?ticket=validTicket&keepme=alive', function(response){
-                response.statusCode.should.equal(303);
-                response.headers.location.should.equal('http://localhost:3000/somePath?keepme=alive');
-                done();
-            });
         });
         it('parses out username with email address format', function(done){
-            http.get('http://localhost:3000/somePath?ticket=validTicket', function(response){
+            request.get({uri: 'http://localhost:3000/somePath?ticket=validTicket', followRedirect: false}, function(err, response){
                 lastRequest.session.name.should.equal('somebody@gmail.com');
                 done();
             });
         });
     });
     describe('when no ticket presented', function(){
-        describe('and gateway turned off', function(){
-            it('redirect to login when no session', function(done){
-                http.get('http://localhost:3000/', function(response){
-                    response.statusCode.should.equal(307);
-                    response.headers.location.should.equal('http://localhost:1337/cas/login?service=http%3A%2F%2Flocalhost%3A3000%2F');
-                    should.not.exist(response.headers['set-cookie']);
+        it('continue if session exists', function(done){
+            var j = request.jar();
+            createSession(j, function(cookie){
+                request.get({uri: 'http://localhost:3000/?ticket=invalidTicket', jar: j, followRedirect: false}, function(err, response){
+                    response.statusCode.should.equal(200);
                     done();
                 });
             });
-            it('continue if session exists', function(done){
-                createSession(function(cookie){
-                    http.get({host: 'localhost', port: 3000, headers: {cookie: cookie}}, function(response){
-                        response.statusCode.should.equal(200);
-                        done();
-                    });
-                });
-            });
-        });
-        describe('and gateway turned on', function(){
-            before(function(){
-                cas.configure({gateway: true});
-            });
-            after(function(){
-                cas.configure({gateway: false});
-            });
-            it('redirect to login with gateway param', function(done){
-                http.get('http://localhost:3000/', function(response){
-                    response.statusCode.should.equal(307);
-                    var query = querystring.parse(parseUrl(response.headers.location).query);
-                    query.gateway.should.equal('true');
-                    done();
-                });
-            });
-            it('continue if already redirected', function(done){
-                http.get('http://localhost:3000', function(response){
-                    var cookie = response.headers['set-cookie'];
-                    http.get({host: 'localhost', port: 3000, headers: {cookie: cookie}}, function(response){
-                        response.statusCode.should.equal(200);
-                        done();
-                    });
-                });
-            });
-
-
         });
     });
 });
@@ -138,6 +93,7 @@ var serverSetup = function(methodName, done){
         next();
     })
     .use(cas[methodName]())
+    .use(cas.authenticate())
     .use(function(req, res, next){
         res.end('hello world');
     });
@@ -145,9 +101,9 @@ var serverSetup = function(methodName, done){
     server.setTimeout(20);
     return server;
 };
-var createSession = function(callback) {
-    http.get('http://localhost:3000/?ticket=validTicket', function(response){
-        callback(response.headers['set-cookie']);
+var createSession = function(jar, callback) {
+    request.get({uri: 'http://localhost:3000/?ticket=validTicket', jar: jar, followRedirect: false}, function(err, res, body){
+        callback(res.headers['set-cookie']);
     });
 }
 
