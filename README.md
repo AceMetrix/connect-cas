@@ -1,12 +1,12 @@
 # Connect CAS
 
-Connect cas is a connect-based middleware that allows you to authenticate through a CAS 2.0+ server.  It supports the gateway feature.
+Connect cas is a connect-based middleware that allows you to authenticate through a CAS 2.0+ server.  It supports the gateway, renew, ssout, and proxy tickets.
 
 Adapted from https://github.com/jmarca/cas_validate
 
 ## Installation
 
-            npm install connect-cas
+    npm install connect-cas
             
 ## Options
 
@@ -30,8 +30,8 @@ var connect = require('connect');
 connect()
   .use(connect.cookieParser('hello world'))
   .use(connect.cookieSession()) // or whatever session store
-  .use(cas.ssout()) // if you wish to use single sign out
-  .use(cas.ticket()); // does the redirection/ticket validation
+  .use(cas.serviceValidate())
+  .use(cas.authenticate())
 ```
 # License
 
