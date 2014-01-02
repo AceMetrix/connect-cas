@@ -10,7 +10,7 @@ Adapted from https://github.com/jmarca/cas_validate
             
 ## Options
 
-Many of these options are borrowed from node's [url documentation](http://nodejs.org/api/url.html).  You may set these options through the `.configure()` method or override them with any of the exposed methods.
+Many of these options are borrowed from node's [url documentation](http://nodejs.org/api/url.html).  You may set global options through the `.configure()` method or override them with any of the exposed middleware.
 
   - `procotol` The protocol to communicate with the CAS Server.  Defaults to 'https'.
   - `host` CAS server hostname
@@ -19,6 +19,7 @@ Many of these options are borrowed from node's [url documentation](http://nodejs
   - `paths`
     - `serviceValidate` Path to validate TGT
     - `proxyValidate` Path to validate PGT (not implemented)
+    - `proxy` Path to obtain a proxy ticket
     - `login` Path to the CAS login
   
 ## Usage
