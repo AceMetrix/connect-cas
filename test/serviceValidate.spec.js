@@ -15,9 +15,9 @@ cas.configure({
 
 var lastRequest;
 describe('#serviceValidate', function(){
-    var server;
+    var casServer, server;
     before(function(done){
-        casServerSetup(function(){
+        casServer = casServerSetup(function(){
             server = serverSetup('serviceValidate', done); 
         });
     });
@@ -78,8 +78,9 @@ var casServerSetup = function(done){
         }
         res.end(response);
     });
-    app.listen(1337, done);
-    return
+    var server = http.createServer(app).listen(1337, done);
+    server.setTimeout(20);
+    return server;
 };
 var serverSetup = function(methodName, done){
     var app = express()
