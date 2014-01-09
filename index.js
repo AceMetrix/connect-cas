@@ -4,3 +4,5 @@ exports.authenticate = require('./lib/authenticate');
 exports.renew = require('./lib/renew');
 exports.gateway = require('./lib/gateway');
 exports.ssout = require('./lib/ssout');
+
+exports.proxyTicket = require('./lib/proxy-ticket');

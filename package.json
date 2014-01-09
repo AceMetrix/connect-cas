@@ -22,7 +22,8 @@
   },
   "dependencies": {
     "request": "~2.30.0",
-    "lodash": "~2.4.1"
+    "lodash": "~2.4.1",
+    "q": "~1.0.0"
   },
   "devDependencies": {
     "mocha": "~1.9.0",
