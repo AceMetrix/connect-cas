@@ -51,7 +51,7 @@ The proxy granting ticket value will be available in `req.session.pgt`
 You may also pass in an absolute url if you wish for the pgtCallback to be in a separate app.  If so, pass in an additional `pgtFn`:
 
 ```
-serviceValidate({pgtUrl: 'http://some-server.com/pgtCallback', pgtFn:function(cb){
+serviceValidate({pgtUrl: 'https://some-server.com/pgtCallback', pgtFn:function(cb){
   ...
   cb(err, 'PGT-thepgtid');
 });
