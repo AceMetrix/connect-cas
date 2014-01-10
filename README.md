@@ -21,7 +21,7 @@ Many of these options are borrowed from node's [url documentation](http://nodejs
     - `proxyValidate` Path to validate PGT (not implemented)
     - `proxy` Path to obtain a proxy ticket
     - `login` Path to the CAS login
-  
+
 ## Usage
 
 ```javascript
@@ -34,6 +34,36 @@ connect()
   .use(cas.serviceValidate())
   .use(cas.authenticate())
 ```
+
+## Proxy Tickets
+
+To get a proxy granting ticket, you can configure the `serviceValidate` middleware like below:
+
+```
+connect()
+  ...
+  .use(cas.serviceValidate({pgtUrl: '/pgtCallback'}))
+  ...
+```
+
+The proxy granting ticket value will be available in `req.session.pgt`
+
+You may also pass in an absolute url if you wish for the pgtCallback to be in a separate app.  If so, pass in an additional `pgtFn`:
+
+```
+serviceValidate({pgtUrl: 'http://some-server.com/pgtCallback', pgtFn:function(cb){
+  ...
+  cb(err, 'PGT-thepgtid');
+});
+```
+Then, use the provided `proxyTicket` method to get a proxy ticket:
+
+```
+cas.proxyTicket({targetService: 'https://service-to-proxy/blah', pgt: 'PGT-blah'}, function(err, proxyTicket){
+    ...
+});
+```
+
 # License
 
   MIT
