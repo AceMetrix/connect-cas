@@ -64,9 +64,9 @@ cas.proxyTicket({targetService: 'https://service-to-proxy/blah', pgt: 'PGT-blah'
 });
 ```
 
-# Notes
+## Notes
 - If you are behind an https proxy, be sure to ask your sys admin to set X-Forwarded-Proto (connect-cas uses it to infer its own location for various features)
 
-# License
+## License
 
   MIT
