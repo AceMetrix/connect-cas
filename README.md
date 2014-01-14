@@ -51,10 +51,12 @@ The proxy granting ticket value will be available in `req.session.pgt`
 You may also pass in an absolute url if you wish for the pgtCallback to be in a separate app.  If so, pass in an additional `pgtFn`:
 
 ```
-serviceValidate({pgtUrl: 'https://some-server.com/pgtCallback', pgtFn:function(cb){
+connect()
+.use(cas.serviceValidate({pgtUrl: 'https://some-server.com/pgtCallback', pgtFn:function(cb){
   ...
   cb(err, 'PGT-thepgtid');
-});
+}));
+...
 ```
 Then, use the provided `proxyTicket` method to get a proxy ticket:
 
