@@ -1,7 +1,7 @@
 {
   "name": "connect-cas",
   "description": "Connect middleware for a node CAS client",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "author": "Duncan Wong <baduncaduncan@gmail.com>",
   "license": "MIT",
   "keywords": [
