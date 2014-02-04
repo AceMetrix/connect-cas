@@ -64,7 +64,7 @@ describe('#serviceValidate', function(){
             });
             it('parses out username with email address format', function(done){
                 request.get({uri: 'https://localhost:3000/somePath?ticket=validTicket', followRedirect: false}, function(err, response){
-                    lastRequest.session.name.should.equal('somebody@gmail.com');
+                    lastRequest.session.user.should.equal('somebody@gmail.com');
                     done();
                 });
             });
@@ -125,7 +125,7 @@ describe('#serviceValidate', function(){
             var casServer, server, pgtCallback = false;
             before(function(done){
                 casServer = casServerSetup(function(){
-                    server = serverSetup({pgtUrl: 'https://localhost:3000/pgtCallback', pgtFn: function(cb){
+                    server = serverSetup({pgtUrl: 'https://localhost:3000/pgtCallback', pgtFn: function(pgtIou, cb){
                         pgtCallback = true;
                         setTimeout(function(){
                             cb(null, 'some-pgtId');

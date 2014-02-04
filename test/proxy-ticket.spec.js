@@ -15,13 +15,13 @@ cas.configure({
 
 var lastRequest;
 describe('#proxyValidate', function(){
-        var casServer, server;
-        before(function(done){
-            casServer = casServerSetup(done);
-        });
-        after(function(done){
-            casServer.close(done);
-        });
+    var casServer;
+    before(function(done){
+        casServer = casServerSetup(done);
+    });
+    after(function(done){
+        casServer.close(done);
+    });
     it('exists', function(){
         cas.proxyTicket.should.be.a('function');
     });
