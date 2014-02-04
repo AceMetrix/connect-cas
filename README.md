@@ -52,7 +52,7 @@ You may also pass in an absolute url if you wish for the pgtCallback to be in a 
 
 ```
 connect()
-.use(cas.serviceValidate({pgtUrl: 'https://some-server.com/pgtCallback', pgtFn:function(cb){
+.use(cas.serviceValidate({pgtUrl: 'https://some-server.com/pgtCallback', pgtFn:function(pgtIou, cb){
   ...
   cb(err, 'PGT-thepgtid');
 }));
