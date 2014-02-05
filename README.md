@@ -37,16 +37,17 @@ connect()
 
 ## Proxy Tickets
 
-To get a proxy granting ticket, you can configure the `serviceValidate` middleware like below:
+To proxy services, you can configure the `serviceValidate` middleware like below:
 
 ```
 connect()
   ...
   .use(cas.serviceValidate({pgtUrl: '/pgtCallback'}))
+  .use(cas.proxyTicket({targetService: 'https://service-to-proxy/blah'});
   ...
 ```
 
-The proxy granting ticket value will be available in `req.session.pgt`
+The proxy granting ticket value will be available in `req.session.pgt` and a hash of proxy tickets are available in `req.pt`.  You may then append that proxy ticket manually to the services you wish to proxy.  To reuse the proxy tickets, see [#25](https://github.com/AceMetrix/connect-cas/issues/25).
 
 You may also pass in an absolute url if you wish for the pgtCallback to be in a separate app.  If so, pass in an additional `pgtFn`:
 
@@ -58,16 +59,9 @@ connect()
 }));
 ...
 ```
-Then, use the provided `proxyTicket` method to get a proxy ticket:
-
-```
-cas.proxyTicket({targetService: 'https://service-to-proxy/blah', pgt: 'PGT-blah'}, function(err, proxyTicket){
-    ...
-});
-```
 
 ## Notes
-- If you are behind an https proxy, be sure to ask your sys admin to set X-Forwarded-Proto (connect-cas uses it to infer its own location for various features)
+- If you are behind an https proxy, be sure to set `X-Forwarded-Proto` headers. Connect-cas uses it to infer its own location for redirection.
 
 ## License
 
