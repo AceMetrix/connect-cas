@@ -64,7 +64,15 @@ describe('#serviceValidate', function(){
             });
             it('parses out username with email address format', function(done){
                 request.get({uri: 'https://localhost:3000/somePath?ticket=validTicket', followRedirect: false}, function(err, response){
-                    lastRequest.session.user.should.equal('somebody@gmail.com');
+                    lastRequest.session.cas.user.should.equal('somebody@gmail.com');
+                    done();
+                });
+            });
+            it('stores arbitrary values into req.session coming from cas', function(done){
+                request.get({uri: 'https://localhost:3000/somePath?ticket=validTicket', followRedirect: false}, function(err, response){
+                    lastRequest.session.cas.should.be.an.Object;
+                    lastRequest.session.cas.user.should.equal('somebody@gmail.com');
+                    lastRequest.session.cas.blah.should.equal('somevalue');
                     done();
                 });
             });
@@ -204,7 +212,7 @@ var casServerSetup = function(done){
     app.get('/cas/serviceValidate', function(req, res){
         var response = '';
         if (/^validTicket/.exec(req.query.ticket)){
-            response = '<cas:serviceResponse xmlns:cas="https:/www.yale.edu/tp.cas"><cas:authenticationSuccess><cas:user>somebody@gmail.com</cas:user>'
+            response = '<cas:serviceResponse xmlns:cas="https:/www.yale.edu/tp.cas"><cas:authenticationSuccess><cas:user>somebody@gmail.com</cas:user><cas:blah>somevalue</cas:blah>';
             if (req.query.pgtUrl) {
                 response += '<cas:proxyGrantingTicket>ioualottamoney</cas:proxyGrantingTicket>';
                 response += '</cas:authenticationSuccess></cas:serviceResponse>';
