@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/AceMetrix/connect-cas.svg)](https://travis-ci.org/AceMetrix/connect-cas)
+
 # Connect CAS
 
 Connect cas is a connect-based middleware that allows you to authenticate through a CAS 2.0+ server.  It supports the gateway auth, single sign-out, and proxying other CAS clients.
@@ -65,3 +67,5 @@ connect()
 ## License
 
   MIT
+
+[![NPM](https://nodei.co/npm/connect-cas.png)](https://nodei.co/npm/connect-cas/)
