@@ -9,7 +9,7 @@ Adapted from https://github.com/jmarca/cas_validate
 ## Installation
 
     npm install connect-cas
-            
+
 ## Options
 
 Many of these options are borrowed from node's [url documentation](http://nodejs.org/api/url.html).  You may set global options through the `.configure()` method or override them with any of the exposed middleware.
@@ -36,6 +36,15 @@ connect()
   .use(cas.serviceValidate())
   .use(cas.authenticate())
 ```
+
+## Complete Example
+
+A more complete example of a simple Express app that uses CAS for login, displays the CAS username, and offers a logout link can be found in the `example` folder. You'll need to copy `example/app.js` to your own folder and install its dependencies:
+
+    npm install express
+    npm install connect-cas
+
+Express is required only for the example app. It is not required for `connect-cas`.
 
 ## Proxy Tickets
 
