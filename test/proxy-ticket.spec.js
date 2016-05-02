@@ -48,8 +48,8 @@ describe('#proxyTicket', function(){
         });
         it('sets req.pt', function(done){
             request.get('https://localhost:3000/asdf', function(err, res, body){
-                should.exist(lastRequest.pt);
-                should.exist(lastRequest.pt['atyourservice']);
+                should.exist(lastRequest.session.pt);
+                should.exist(lastRequest.session.pt['atyourservice']);
                 done();
             });
         });
