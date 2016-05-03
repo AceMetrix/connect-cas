@@ -54,11 +54,11 @@ describe('#proxyTicket', function(){
             });
         });
     });
-    describe('when req.pt already exists', function(){
+    describe('when req.session.pt already exists', function(){
         before(function(done){
             option.beforeMiddleware = function(req, res, next){
                 req.session.pgt = 'validPGT';
-                req.pt = {'atyourservice': 'some-PT'}
+                req.session.pt = {'atyourservice': 'some-PT'}
                 next();
             };
             casServer = casServerSetup(function(){
@@ -68,7 +68,7 @@ describe('#proxyTicket', function(){
 
         it('leaves the pt intact when it already exists', function(done){
              request.get('https://localhost:3000/asdf', function(err, res, body){
-                lastRequest.pt['atyourservice'].should.equal('some-PT');
+                lastRequest.session.pt['atyourservice'].should.equal('some-PT');
                 done();
             });
         });
