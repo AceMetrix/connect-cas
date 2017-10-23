@@ -24,7 +24,7 @@
     "http-status-codes": "^1.0.5",
     "lodash": "~2.4.1",
     "q": "~1.0.0",
-    "request": "~2.30.0",
+    "request": "~2.81.0",
     "xml2js": "~0.4.1"
   },
   "devDependencies": {
